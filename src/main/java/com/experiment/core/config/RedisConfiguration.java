@@ -1,6 +1,10 @@
 package com.experiment.core.config;
 
 import com.experiment.core.service.redislock.RedisDistributedLock;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -54,6 +58,25 @@ public class RedisConfiguration {
     public RedisDistributedLock redisDistributedLock() {
         return new RedisDistributedLock(redisTemplate(), LOCK_PRE_KEY);
     }
+
+//    @Value("${redisson.address}")
+//    private String addressUrl;
+//    @Value("${redisson.password}")
+//    private String password;
+//
+//    @Bean(name = "redisson")
+//    public RedissonClient getRedisson() {
+//        Config config = new Config();
+//        config.useSingleServer()
+//                .setAddress(addressUrl).setPassword(password)
+//                .setReconnectionTimeout(10000)
+//                .setRetryInterval(5000)
+//                .setTimeout(10000)
+//                .setConnectTimeout(10000);
+//        RedissonClient redissonClient = Redisson.create(config);
+//        return redissonClient;
+//    }
+
 
 
 }

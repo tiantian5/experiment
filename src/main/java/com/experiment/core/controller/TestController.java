@@ -8,6 +8,7 @@ import com.experiment.core.service.factory.factoryone.FactoryOneEventInterfaceHa
 import com.experiment.core.service.factory.factoryone.OneEventFactory;
 import com.experiment.core.service.factory.factorythree.ThreeFactoryServiceDeal;
 import com.experiment.core.service.factory.factorytwo.TwoStrategyFactory;
+import com.experiment.core.service.productiveconsumption.StockCalibrator;
 import com.experiment.core.service.thread.fourthread.CountDownLatchThread;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationEventPublisher;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collections;
 
 /**
@@ -42,6 +44,9 @@ public class TestController {
 
     @Resource
     private CountDownLatchThread countDownLatchThread;
+
+    @Resource
+    private StockCalibrator stockCalibrator;
 
     /**
      * 工厂一 测试类
@@ -101,6 +106,22 @@ public class TestController {
         countDownLatchThread.dealNumberForOneThread();
 
         countDownLatchThread.dealNumberForUnSyncThread();
+
+    }
+
+    /**
+     * 生产消费 测试类
+     */
+    @RequestMapping("/coustomTest")
+    @ResponseBody
+    public void coustomTest(){
+
+        ArrayList<Long> spuIds = new ArrayList<Long>(){{
+            add(1L);
+            add(2L);
+            add(3L);
+        }};
+        stockCalibrator.addChangedSkuIds(spuIds);
 
     }
 
