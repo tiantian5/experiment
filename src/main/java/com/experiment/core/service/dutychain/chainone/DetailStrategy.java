@@ -16,7 +16,6 @@ public interface DetailStrategy {
      */
     Object getDetail(Object ... obj);
 
-
     /**
      * 策略类型
      *

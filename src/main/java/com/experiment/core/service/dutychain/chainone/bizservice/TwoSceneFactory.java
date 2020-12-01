@@ -3,8 +3,8 @@ package com.experiment.core.service.dutychain.chainone.bizservice;
 import com.experiment.core.enums.EnumFactory;
 import com.experiment.core.service.dutychain.chainone.AbstractDetailStrategy;
 import com.experiment.core.service.dutychain.chainone.context.DetailContext;
-import com.experiment.core.service.dutychain.chainone.handelchain.BaseHandelChain;
-import com.experiment.core.service.dutychain.chainone.handelchain.OneSceneHandelChain;
+import com.experiment.core.service.dutychain.chainone.handelchain.BaseHandelChainDetail;
+import com.experiment.core.service.dutychain.chainone.handelchain.OneSceneHandelChainDetail;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,9 +20,9 @@ public class TwoSceneFactory extends AbstractDetailStrategy {
     public Object getDetail(Object... obj) {
 
         // 只需基础链路+链路一
-        BaseHandelChain baseHandelChain = new BaseHandelChain();
+        BaseHandelChainDetail baseHandelChain = new BaseHandelChainDetail();
 
-        baseHandelChain.setNextHandler(new OneSceneHandelChain());
+        baseHandelChain.setNextHandler(new OneSceneHandelChainDetail());
 
         return baseHandelChain.handleMessage(new DetailContext());
 

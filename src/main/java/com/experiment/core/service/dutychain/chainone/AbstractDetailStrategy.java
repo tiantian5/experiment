@@ -1,9 +1,9 @@
 package com.experiment.core.service.dutychain.chainone;
 
 import com.experiment.core.service.dutychain.chainone.context.DetailContext;
-import com.experiment.core.service.dutychain.chainone.handelchain.BaseHandelChain;
-import com.experiment.core.service.dutychain.chainone.handelchain.OneSceneHandelChain;
-import com.experiment.core.service.dutychain.chainone.handelchain.TwoSceneHandelChain;
+import com.experiment.core.service.dutychain.chainone.handelchain.BaseHandelChainDetail;
+import com.experiment.core.service.dutychain.chainone.handelchain.OneSceneHandelChainDetail;
+import com.experiment.core.service.dutychain.chainone.handelchain.TwoSceneHandelChainDetail;
 
 /**
  * @author tzw
@@ -22,10 +22,10 @@ public abstract class AbstractDetailStrategy implements DetailStrategy {
     @Override
     public Object getDetail(Object... obj) {
 
-        BaseHandelChain baseHandelChain = new BaseHandelChain();
+        BaseHandelChainDetail baseHandelChain = new BaseHandelChainDetail();
 
-        baseHandelChain.setNextHandler(new OneSceneHandelChain()).
-                setNextHandler(new TwoSceneHandelChain());
+        baseHandelChain.setNextHandler(new OneSceneHandelChainDetail()).
+                setNextHandler(new TwoSceneHandelChainDetail());
 
         return baseHandelChain.handleMessage(new DetailContext());
 

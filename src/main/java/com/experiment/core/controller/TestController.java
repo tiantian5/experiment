@@ -8,6 +8,7 @@ import com.experiment.core.service.factory.factoryone.FactoryOneEventInterfaceHa
 import com.experiment.core.service.factory.factoryone.OneEventFactory;
 import com.experiment.core.service.factory.factorythree.ThreeFactoryServiceDeal;
 import com.experiment.core.service.factory.factorytwo.TwoStrategyFactory;
+import com.experiment.core.service.thread.fourthread.CountDownLatchThread;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
@@ -38,6 +39,9 @@ public class TestController {
 
     @Resource
     private ApplicationEventPublisher publisher;
+
+    @Resource
+    private CountDownLatchThread countDownLatchThread;
 
     /**
      * 工厂一 测试类
@@ -84,6 +88,19 @@ public class TestController {
     public void fourFactoryTest(){
 
         this.publisher.publishEvent(new Event<>(this, EnumEvent.BRAND_GET_PITEM, Collections.singleton("")));
+
+    }
+
+    /**
+     * 线程 测试类
+     */
+    @RequestMapping("/threadTest")
+    @ResponseBody
+    public void threadTest(){
+
+        countDownLatchThread.dealNumberForOneThread();
+
+        countDownLatchThread.dealNumberForUnSyncThread();
 
     }
 
