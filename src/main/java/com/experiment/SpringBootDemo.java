@@ -3,6 +3,7 @@ package com.experiment;
 import com.alibaba.dubbo.config.spring.context.annotation.DubboComponentScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -13,7 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  **/
 
 @EnableAsync
-@SpringBootApplication
+@SpringBootApplication(exclude = DataSourceAutoConfiguration.class,scanBasePackages={ "com.experiment.core"})
 @EnableTransactionManagement
 @DubboComponentScan
 public class SpringBootDemo {
