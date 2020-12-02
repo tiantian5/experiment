@@ -9,6 +9,8 @@ import com.experiment.core.service.factory.factoryone.OneEventFactory;
 import com.experiment.core.service.factory.factorythree.ThreeFactoryServiceDeal;
 import com.experiment.core.service.factory.factorytwo.TwoStrategyFactory;
 import com.experiment.core.service.productiveconsumption.StockCalibrator;
+import com.experiment.core.service.template.Account;
+import com.experiment.core.service.template.module.OneAcountModule;
 import com.experiment.core.service.thread.fourthread.CountDownLatchThread;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationEventPublisher;
@@ -47,7 +49,6 @@ public class TestController {
 
     @Resource
     private StockCalibrator stockCalibrator;
-
     /**
      * 工厂一 测试类
      */
@@ -122,6 +123,18 @@ public class TestController {
             add(3L);
         }};
         stockCalibrator.addChangedSkuIds(spuIds);
+
+    }
+
+    /**
+     * 模板模式 测试类
+     */
+    @RequestMapping("/templateTest")
+    @ResponseBody
+    public void templateTest(){
+
+        Account account = new OneAcountModule();
+        System.out.println(account.calculateInterest(10L));
 
     }
 
