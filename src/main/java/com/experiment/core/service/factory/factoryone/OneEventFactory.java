@@ -21,7 +21,7 @@ import java.util.Map;
 @Component
 public class OneEventFactory implements ApplicationContextAware {
 
-    private static Map<EnumFactory, FactoryOneEventInterfaceHandler> wrapFilter = new HashMap<EnumFactory, FactoryOneEventInterfaceHandler>();
+    private static Map<EnumFactory, FactoryOneEventInterfaceHandler> wrapFilter = new HashMap<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
