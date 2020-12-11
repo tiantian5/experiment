@@ -1,0 +1,35 @@
+一、tomcat调优方式
+1、JVM参数进行优化：-Xms<size>是JVM是堆的初始化大小，Xmx<size>是JVM的最大值。􏱎􏱏􏰟􏱐􏱇􏱈􏰻􏱑􏱒􏱓􏱔􏰺􏰻􏰿􏰼􏱀􏱕􏱖􏱗􏱘􏱙􏱚􏱛􏰷􏱑􏱒􏱜􏱔(当应用程序内存超过堆的最大值就会产生内存溢出)
+堆的最大值一般设值一般在内存的80%，修改地方是在catalina.bat中设置JAVA_OPTS='-Xms256m- Xmx512m'(最小值是256兆，最大值是512兆)
+2、禁用DNS的查询：web应用程序要记录客服端信息的时候，它会记录客户端IP等，这样DNS查询占用网络比较耗时。若是不需要则可以通过配置关闭，
+可以修改server.xml中的enableLookups修改为"false"
+3、调整线程数：maxThreads根据内存占比例来进行设置tomcat的最大线程数
+
+二、调整tomcat的参数
+1、minProcessors：最小空闲连接线程数，提高系统处理性能，默认值是10
+2、maxProcessors：最大连接线程数(并发处理最大请求数)，默认值是75
+3、acceptCount：允许最大连接数(>=maxProcessors)，默认值是100
+4、enableLookups：是否反查域名，若提高性能置为false
+5、connectionTimeout：网络超时时间，若设置为0是有隐患的(永不超时)，一般设置为30000ms
+6、web server最大的连接数是有内核控制的，通常windows是2000个，linux是1000个
+
+三、Tomcat􏴀􏴧􏵄􏵗􏸐􏲠􏰏的4种部署方式
+1、在tomcat中的server.xml文件中<host/>节点新增
+<Context path="/hello"
+docBase="C:/User/forwebtoolsworkspacehello/WebRoot"debug="0"
+privileged="true">
+</Context>
+2、web项目copy到webapps目录下
+3、conf目录中Catalina目录，新增xml文件(名字随便起)，xml内容如下：
+<Context path="/hello"docBase="C:/User/forwebtoolsworkspacehello/WebRoot"
+debug="0"privileged="true">
+</Context>
+4、tomcat后天台管理器直接上传war包
+
+四、tomcat优化点
+1、去掉web.xml中的监视，把jps编辑为servlet。如果有多余内容可以加大tomcat使用jvm的内容
+2、内存在处理大量数据的时候对内存容量较高，可以使用-Xmx-Xms-XX:MaxPermSize对内容功能进行划分
+3、对于静态页面以及静态文件使用Nginx缓存起来，不必每次都进行磁盘读出
+4、集群处理，Nginx进行分流多个tomcat共享session进行工作
+5、优化tomcat参数
+
