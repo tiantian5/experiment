@@ -3,6 +3,8 @@ package com.experiment.core.controller;
 import com.experiment.core.dto.BaseDTO;
 import com.experiment.core.enums.EnumEvent;
 import com.experiment.core.enums.EnumFactory;
+import com.experiment.core.service.factory.factoryfive.EnumInterfaceNotifyAction;
+import com.experiment.core.service.factory.factoryfive.NotifyCallBackParam;
 import com.experiment.core.service.factory.factoryfour.event.Event;
 import com.experiment.core.service.factory.factoryone.FactoryOneEventInterfaceHandler;
 import com.experiment.core.service.factory.factoryone.OneEventFactory;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 
 /**
  * @author tzw
@@ -94,6 +97,21 @@ public class TestController {
     public void fourFactoryTest(){
 
         this.publisher.publishEvent(new Event<>(this, EnumEvent.BRAND_GET_PITEM, Collections.singleton("")));
+
+    }
+
+    /**
+     * 工厂五 测试类
+     */
+    @RequestMapping("/fiveFactoryTest")
+    @ResponseBody
+    public void fiveFactoryTest(){
+
+        NotifyCallBackParam notifyCallBackParam = new NotifyCallBackParam();
+        notifyCallBackParam.setName("tzq");
+
+        Objects.requireNonNull(EnumInterfaceNotifyAction.getInstance(1, 2, 3))
+                .notifyAction(notifyCallBackParam);
 
     }
 
