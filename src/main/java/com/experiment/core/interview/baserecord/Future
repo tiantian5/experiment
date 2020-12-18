@@ -1,0 +1,118 @@
+Future相关
+一、rpc的四种调用方式
+oneway：直接请求等待结果
+sync：异步调用，结果异步回显
+future：可阻塞、可等待
+callback：直接调用，结果等待回调
+
+二、线程调用 future.get() 方法的时候还是会阻塞当前线程的
+
+三、Future相关的线程池
+1、最简单的是execute提交任务，不关心返回值，全部丢去线程池中处理就完事
+ThreadPoolExecutor executor = new ThreadPoolExecutor(2, 5, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(10));
+    executor.execute(() -> {
+        System.out.println("测试");
+    });
+Thread.currentThread().join();
+Java8的函数其实就是一个submit方法，submit有三种方法(分为两个类型)，返回值都是Future。
+    提交执行 Runnable 类型的任务。
+    提交执行 Callable 类型的任务。
+Callable类型任务就是在线程中return(任务体里面带上一个返回值)，运行结果也能拿到任务体里面的返回了
+Runable类型任务是冲载方法，看源码一个是传入泛型(会返回你设定的类型)，一个是不传入泛型(他会返回一个null)
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(2, 5, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(10));
+        Future<?> future = executor.submit(() -> {
+            System.out.println("测试");
+        });
+        System.out.println("future的内容:" + future.get());
+        Thread.currentThread().join();
+        返回一个null
+
+
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(2, 5, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(10));
+        AtomicInteger atomicInteger = new AtomicInteger();
+        Future<AtomicInteger> future = executor.submit(() -> {
+            System.out.println("测试");
+            //在这里进行计算逻辑
+            atomicInteger.set(5201314);
+        }, atomicInteger);
+
+        System.out.println("future的内容:" + future.get());
+        Thread.currentThread().join();
+
+        返回的是5201314
+
+2、一个线程池中的线程异常了，那么线程池会怎么处理这个线程?
+
+3、Google提供的Guava 的 Future可以注册一个回调函数(新增了一个 addListenter 方法，入参是一个 Runnable 的任务类型和一个线程池)
+    public static void main(String[] args) throws Exception {
+        ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
+        ListenableFuture<String> listenableFuture = executor.submit(() -> {
+            System.out.println(Thread.currentThread().getName()+"-女神：我开始化妆了，好了我叫你。");
+            TimeUnit.SECONDS.sleep(5);
+            return "化妆完毕了。";
+        });
+
+        listenableFuture.addListener(() -> {
+            try {
+                System.out.println(Thread.currentThread().getName()+"-future的内容:" + listenableFuture.get());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, executor);
+        System.out.println(Thread.currentThread().getName()+"-等女神化妆的时候可以干点自己的事情。");
+        Thread.currentThread().join();
+    }
+
+    首先创建线程池的方式变了，需要用 Guava 里面的 MoreExecutors 方法装饰一下
+    然后用装饰后的 executor 调用 submit 方法（任意一种），就会返回 ListenableFuture ，拿到这个 ListenableFuture 之后，我们就可以在上面注册监听
+    获取运行结果是在另外的线程里面执行的，完全没有阻塞主线程。
+
+
+4、FutureCallback 的方式比Guava 的 Future更明了
+    public static void main(String[] args) throws Exception {
+        ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
+        ListenableFuture<String> listenableFuture = executor.submit(() -> {
+            System.out.println(Thread.currentThread().getName()+"-女神：我开始化妆了，好了我叫你。");
+            TimeUnit.SECONDS.sleep(5);
+            return "化妆完毕了。";
+        });
+        Futures.addCallback(listenableFuture, new FutureCallback<String>() {
+            @Override
+            public void onSuccess(@Nullable String result) {
+                System.out.println(Thread.currentThread().getName()+"-future的内容:" + result);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                System.out.println(Thread.currentThread().getName()+"-女神放你鸽子了。");
+                t.printStackTrace();
+            }
+        });
+        System.out.println(Thread.currentThread().getName()+"-等女神化妆的时候可以干点自己的事情。");
+        Thread.currentThread().join();
+    }
+
+    若主方法中抛异常可以在onFailure中处理
+
+5、 CompletableFuture(JDK 1.8才有) 比 FutureCallback更好用。更多方法参看其API
+CompletableFuture 实现了两个接口，一个是我们熟悉的 Future ，一个是 CompletionStage(阶段性)
+多个 CompletionStage 链接在一起就是一个任务链。前一个任务完成后，下一个任务就会自动触发。
+CompletableFuture 对于异常的处理，它提供了一个 handle 方法，可以处理上游异步任务中出现的异常
+    public static void main(String[] args) throws Exception {
+        CompletableFuture.supplyAsync(() -> {
+            System.out.println(Thread.currentThread().getName() + "-女神：我开始化妆了，好了我叫你。");
+            throw new RuntimeException("男神约我看电影了，我们下次再约吧，你是个好人。");
+        }).handleAsync((result, exception) -> {
+            if (exception != null) {
+                System.out.println(Thread.currentThread().getName() + "-女神放你鸽子了！");
+                return exception.getCause();
+            } else {
+                return result;
+            }
+        }).thenApplyAsync((returnStr) -> {
+            System.out.println(Thread.currentThread().getName() + "-" + returnStr);
+            return returnStr;
+        });
+        System.out.println(Thread.currentThread().getName() + "-等女神化妆的时候可以干点自己的事情。");
+        Thread.currentThread().join();
+    }

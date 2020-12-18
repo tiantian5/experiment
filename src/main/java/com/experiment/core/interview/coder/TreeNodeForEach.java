@@ -1,4 +1,4 @@
-package com.experiment.core.interview.code;
+package com.experiment.core.interview.coder;
 
 import com.alibaba.fastjson.JSONObject;
 

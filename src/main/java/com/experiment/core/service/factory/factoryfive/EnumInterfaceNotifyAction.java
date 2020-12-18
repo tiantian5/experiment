@@ -71,6 +71,7 @@ public enum EnumInterfaceNotifyAction implements InterfaceNotifyAction {
         return newStatus;
     }
 
+
     /**
      * 业务判断
      *

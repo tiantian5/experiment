@@ -1,4 +1,4 @@
-package com.experiment.core.interview.code;
+package com.experiment.core.interview.coder;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
