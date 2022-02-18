@@ -7,9 +7,6 @@ import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author tzw
  * @description bean之间的转化
@@ -52,21 +49,6 @@ public class ClassConvert {
                 }).register();
 
         // 所有转化以此类推即可......
-
-    }
-
-    public static void main(String[] args) {
-
-        B b = new B();
-
-        List<B> bList = new ArrayList<>();
-        bList.add(b);
-
-        // 单个转化
-        A a = ClassConvert.FACTORY.getMapperFacade().map(b, A.class);
-
-        // list转化
-        List<A> aList = ClassConvert.FACTORY.getMapperFacade().mapAsList(bList, A.class);
 
     }
 

@@ -1,2 +1,0 @@
-dubboProviderFilter=com.experiment.core.aop.DubboProviderFilter
-dubboConsumerFilter=com.experiment.core.aop.DubboConsumerFilter

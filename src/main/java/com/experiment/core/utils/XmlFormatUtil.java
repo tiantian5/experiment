@@ -8,10 +8,6 @@ import com.thoughtworks.xstream.io.xml.XppDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import java.io.StringWriter;
-
 /**
  * @author tzw
  * @description xml相互转化类
@@ -32,26 +28,26 @@ public class XmlFormatUtil {
      */
     public static <T> String javaBeanToXml(T t, Boolean isToOuter) {
         try {
-            JAXBContext context = JAXBContext.newInstance(t.getClass());
-            Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            StringWriter writer = new StringWriter();
-            marshaller.marshal(t, writer);
-            String str = writer.toString();
-            String replace = null;
-            if (StringUtils.isNotBlank(str)) {
-                replace = str.replace(XML_HEAD_3, "");
-                if (isToOuter) {
-                    replace = replace
-                            .replace(toLowerCaseFirstOne(t.getClass().getSimpleName()), "response")
-                            .trim();
-                } else {
-                    replace = replace
-                            .replace(toLowerCaseFirstOne(t.getClass().getSimpleName()), "request")
-                            .trim();
-                }
-            }
-            return replace;
+//            JAXBContext context = JAXBContext.newInstance(t.getClass());
+//            Marshaller marshaller = context.createMarshaller();
+//            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+//            StringWriter writer = new StringWriter();
+//            marshaller.marshal(t, writer);
+//            String str = writer.toString();
+//            String replace = null;
+//            if (StringUtils.isNotBlank(str)) {
+//                replace = str.replace(XML_HEAD_3, "");
+//                if (isToOuter) {
+//                    replace = replace
+//                            .replace(toLowerCaseFirstOne(t.getClass().getSimpleName()), "response")
+//                            .trim();
+//                } else {
+//                    replace = replace
+//                            .replace(toLowerCaseFirstOne(t.getClass().getSimpleName()), "request")
+//                            .trim();
+//                }
+//            }
+//            return replace;
         } catch (Exception e) {
             log.error("XmlUtil javaBeanToXml t is {}", JSONObject.toJSONString(t), e);
         }

@@ -17,3 +17,7 @@ spring:
 redisson:
   address: redis://localhost:6379
   password: web2017
+
+logging:
+  level:
+    com.javagirl.yomall: info

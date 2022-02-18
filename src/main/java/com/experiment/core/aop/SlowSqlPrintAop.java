@@ -6,12 +6,15 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
-import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Intercepts;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.TypeHandlerRegistry;
-import sun.plugin2.main.server.ResultHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +28,7 @@ import java.util.concurrent.Executor;
  **/
 
 @Intercepts(value = {
-        @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
+        @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class}),
         @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class})})
 @Slf4j
 public class SlowSqlPrintAop implements Interceptor {
