@@ -51,9 +51,8 @@ public class WeChatSendMessageModel implements SendMessageStrategy {
                 break;
 
             case FILE:
-                this.dealFile(sendMessageDTO, sendMessageContext);
+//                this.dealFile(sendMessageDTO, sendMessageContext);
                 break;
-vcdsaq  aszxc dsxc
             default:
                 break;
 
