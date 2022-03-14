@@ -27,12 +27,12 @@ public class StencilsLogRecordAspect {
     /**
      * 以自定义 @StencilsLogRecord 注解为切点
      */
-    @Pointcut("@annotation(com.experiment.core.aop.annotationAop.StencilsLogRecord)")
-    public void annotation() {
+//    @Pointcut("@annotation(com.experiment.core.aop.annotationAop.StencilsLogRecord)")
+//    public void annotation() {
+//
+//    }
 
-    }
-
-    @After("annotation()")
+//    @After("annotation()")
     public void dealStencilsLogRecord(JoinPoint point) {
 
 //        StencilsLogRecord exportLock = ((MethodSignature) point.getSignature()).getMethod().getAnnotation(StencilsLogRecord.class);

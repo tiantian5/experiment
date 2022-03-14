@@ -20,9 +20,10 @@ import java.util.concurrent.Future;
 public class AsyncDetailFacade {
 
     @Async(value = "asyncServiceExecutor")
-    public Future getName (ThreadContext threadContext, CountDownLatch countDownLatch) {
+    public Future<?> getName (ThreadContext threadContext, CountDownLatch countDownLatch) {
         try {
             threadContext.setName("name");
+            Thread.sleep(2000);
         } catch (Exception e) {
             log.error("异常", e);
         } finally {
@@ -34,9 +35,10 @@ public class AsyncDetailFacade {
     }
 
     @Async(value = "asyncServiceExecutor")
-    public Future getAge (ThreadContext threadContext, CountDownLatch countDownLatch) {
+    public Future<?> getAge (ThreadContext threadContext, CountDownLatch countDownLatch) {
         try {
             threadContext.setAge(1);
+            Thread.sleep(2000);
         } catch (Exception e) {
             log.error("异常", e);
         } finally {
@@ -45,6 +47,24 @@ public class AsyncDetailFacade {
             }
         }
         return new AsyncResult<>("");
+    }
+
+    public void getName (ThreadContext threadContext) {
+        threadContext.setName("name");
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            log.error("异常", e);
+        }
+    }
+
+    public void getAge (ThreadContext threadContext) {
+        threadContext.setAge(1);
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            log.error("异常", e);
+        }
     }
 
 }

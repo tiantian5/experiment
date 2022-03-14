@@ -13,7 +13,9 @@ import com.experiment.core.service.factory.factorytwo.TwoStrategyFactory;
 import com.experiment.core.service.productiveconsumption.StockCalibrator;
 import com.experiment.core.service.template.Account;
 import com.experiment.core.service.template.module.OneAcountModule;
+import com.experiment.core.service.thread.ThreadContext;
 import com.experiment.core.service.thread.fourthread.CountDownLatchThread;
+import com.experiment.core.service.thread.threethread.ThreeNeedThreadResult;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
@@ -52,6 +54,9 @@ public class TestController {
 
     @Resource
     private StockCalibrator stockCalibrator;
+
+    @Resource
+    private ThreeNeedThreadResult threeNeedThreadResult;
     /**
      * 工厂一 测试类
      */
@@ -155,5 +160,23 @@ public class TestController {
         System.out.println(account.calculateInterest(10L));
 
     }
+
+    @RequestMapping("/testCountDownLatch")
+    @ResponseBody
+    public ThreadContext testCountDownLatch() {
+
+        return threeNeedThreadResult.getIndexInfoForCountDownLatch();
+
+    }
+
+    @RequestMapping("/getIndexInfoForGeneral")
+    @ResponseBody
+    public ThreadContext getIndexInfoForGeneral() {
+
+        return threeNeedThreadResult.getIndexInfoForGeneral();
+
+    }
+
+
 
 }
