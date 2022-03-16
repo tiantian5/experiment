@@ -44,7 +44,7 @@ public class ThreeNeedThreadResult {
             // 二、age
             task.add(asyncDetailFacade.getAge(threadContext, countDownLatch));
 
-            boolean wait = countDownLatch.await(3, TimeUnit.SECONDS);
+            boolean wait = countDownLatch.await(1, TimeUnit.SECONDS);
             if(!wait){
                 throw new RuntimeException("存在子线程运行超时");
             }

@@ -23,9 +23,16 @@ public class AsyncDetailFacade {
     public Future<?> getName (ThreadContext threadContext, CountDownLatch countDownLatch) {
         try {
             threadContext.setName("name");
-            Thread.sleep(2000);
+//            Thread.sleep(10000);
+            for (int i = 0; i < 10; i++) {
+                threadContext.setName("sasa");
+                for (int j = 0; j < 1000000000; j++) {
+                    threadContext.setName("sasa");
+                }
+            }
+            log.info("执行完了");
         } catch (Exception e) {
-            log.error("异常", e);
+            log.error("AAA异常", e);
         } finally {
             if(countDownLatch != null){
                 countDownLatch.countDown();
@@ -38,7 +45,6 @@ public class AsyncDetailFacade {
     public Future<?> getAge (ThreadContext threadContext, CountDownLatch countDownLatch) {
         try {
             threadContext.setAge(1);
-            Thread.sleep(2000);
         } catch (Exception e) {
             log.error("异常", e);
         } finally {
