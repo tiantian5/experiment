@@ -69,7 +69,7 @@ public class WeChatSendMessageModel implements SendMessageStrategy {
      */
     private void dealNews(SendMessageDTO sendMessageDTO, SendMessageContext sendMessageContext) {
 
-        List<SendMessageNewsBO> sendMessageNewsBOList = JSONObject.parseArray(sendMessageDTO.getJson(), SendMessageNewsBO.class);
+        List<SendMessageNewsBO> sendMessageNewsBOList = JSONObject.parseArray(JSONObject.toJSONString(sendMessageDTO.getObj()), SendMessageNewsBO.class);
         if (CollectionUtils.isEmpty(sendMessageNewsBOList)) {
             throw new RuntimeException("解析图文信息异常，请检查数据是否正确传入");
         }
@@ -110,7 +110,7 @@ public class WeChatSendMessageModel implements SendMessageStrategy {
      */
     private void dealImage(SendMessageDTO sendMessageDTO, SendMessageContext sendMessageContext) {
 
-        SendMessageImageBO sendMessageImageBO = JSONObject.parseObject(sendMessageDTO.getJson(), SendMessageImageBO.class);
+        SendMessageImageBO sendMessageImageBO = (SendMessageImageBO) sendMessageDTO.getObj();
         if (sendMessageImageBO == null
                 || StringUtils.isBlank(sendMessageImageBO.getPicUrl())) {
             throw new RuntimeException("解析图片信息异常，请检查数据是否正确传入");
@@ -136,7 +136,7 @@ public class WeChatSendMessageModel implements SendMessageStrategy {
      */
     private void dealText(SendMessageDTO sendMessageDTO, SendMessageContext sendMessageContext) {
 
-        SendMessageTextBO sendMessageTextBO = JSONObject.parseObject(sendMessageDTO.getJson(), SendMessageTextBO.class);
+        SendMessageTextBO sendMessageTextBO = (SendMessageTextBO) sendMessageDTO.getObj();
         if (sendMessageTextBO == null || StringUtils.isBlank(sendMessageTextBO.getContext())) {
             throw new RuntimeException("解析文本信息异常，请检查数据是否正确传入");
         }

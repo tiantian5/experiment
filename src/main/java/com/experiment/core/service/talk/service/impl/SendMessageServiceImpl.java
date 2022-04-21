@@ -37,7 +37,7 @@ public class SendMessageServiceImpl implements SendMessageService {
         Assert.notNull(sendMessageDTO, "入参为空");
         Assert.notNull(EnumSendPlatform.getSendPlatformByType(sendMessageDTO.getPlatFormCode()), "入参发送平台为空");
         Assert.notNull(EnumSendType.getEnumSendTypeByType(sendMessageDTO.getMsgType()), "入参发送类型为空");
-        Assert.notNull(sendMessageDTO.getJson(), "入参发送内容为空");
+        Assert.notNull(sendMessageDTO.getObj(), "入参发送内容为空");
         Assert.notNull(sendMessageDTO.getRobotUrl(), "入参机器人链接为空");
         if (EnumSendPlatform.DING_DING_TALK.equals(EnumSendPlatform.getSendPlatformByType(sendMessageDTO.getPlatFormCode()))
                 && StringUtils.isBlank(sendMessageDTO.getSign())) {

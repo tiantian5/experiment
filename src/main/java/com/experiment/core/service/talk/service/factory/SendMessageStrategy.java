@@ -25,6 +25,7 @@ public interface SendMessageStrategy {
      *
      * @param sendMessageContext 上下文
      * @param sendMessageDTO 入参
+     * @return String
      */
     String sendMessageForPlatForm(SendMessageContext sendMessageContext, SendMessageDTO sendMessageDTO);
 

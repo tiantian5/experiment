@@ -2,8 +2,6 @@ package com.experiment.core.service.talk.dto;
 
 import lombok.Data;
 
-import java.util.List;
-
 /**
  * Created with IntelliJ IDEA.
  *
@@ -26,9 +24,9 @@ public class SendMessageDTO {
     private Integer msgType;
 
     /**
-     * 内容
+     * 具体推送消息
      */
-    private String json;
+    private Object obj;
 
     /**
      * 机器人链接

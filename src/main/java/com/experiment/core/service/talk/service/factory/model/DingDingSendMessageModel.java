@@ -105,7 +105,7 @@ public class DingDingSendMessageModel implements SendMessageStrategy {
      */
     private void dealText(SendMessageDTO sendMessageDTO, SendMessageContext sendMessageContext) {
 
-        SendMessageTextBO sendMessageTextBO = JSONObject.parseObject(sendMessageDTO.getJson(), SendMessageTextBO.class);
+        SendMessageTextBO sendMessageTextBO = (SendMessageTextBO) sendMessageDTO.getObj();
         if (sendMessageTextBO == null || StringUtils.isBlank(sendMessageTextBO.getContext())) {
             throw new RuntimeException("解析文本信息异常，请检查数据是否正确传入");
         }
@@ -139,7 +139,7 @@ public class DingDingSendMessageModel implements SendMessageStrategy {
      */
     private void dealLink(SendMessageDTO sendMessageDTO, SendMessageContext sendMessageContext) {
 
-        SendMessageLinkBO sendMessageLinkBO = JSONObject.parseObject(sendMessageDTO.getJson(), SendMessageLinkBO.class);
+        SendMessageLinkBO sendMessageLinkBO = (SendMessageLinkBO)sendMessageDTO.getObj();
         if (sendMessageLinkBO == null
                 || StringUtils.isBlank(sendMessageLinkBO.getText())
                 || StringUtils.isBlank(sendMessageLinkBO.getTitle())
@@ -169,7 +169,7 @@ public class DingDingSendMessageModel implements SendMessageStrategy {
      */
     private void dealImage(SendMessageDTO sendMessageDTO, SendMessageContext sendMessageContext) {
 
-        SendMessageImageBO sendMessageImageBO = JSONObject.parseObject(sendMessageDTO.getJson(), SendMessageImageBO.class);
+        SendMessageImageBO sendMessageImageBO = (SendMessageImageBO) sendMessageDTO.getObj();
         if (sendMessageImageBO == null
                 || StringUtils.isBlank(sendMessageImageBO.getPicUrl())) {
             throw new RuntimeException("解析图片信息异常，请检查数据是否正确传入");
