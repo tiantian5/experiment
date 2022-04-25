@@ -17,7 +17,7 @@ import java.util.List;
 public class DingDingTextDTO {
 
     /**
-     * 发送类型
+     * 发送类型 sendNameEn
      * @see EnumSendType
      */
     private String msgtype;

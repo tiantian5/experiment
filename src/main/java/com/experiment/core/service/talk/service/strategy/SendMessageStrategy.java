@@ -1,4 +1,4 @@
-package com.experiment.core.service.talk.service.factory;
+package com.experiment.core.service.talk.service.strategy;
 
 import com.experiment.core.service.talk.dto.SendMessageDTO;
 import com.experiment.core.service.talk.service.context.SendMessageContext;
@@ -11,6 +11,14 @@ import com.experiment.core.service.talk.service.context.SendMessageContext;
  * @Description: 业务分发处理
  */
 public interface SendMessageStrategy {
+
+    /**
+     * 链路信息校验
+     *
+     * @param sendMessageDTO 入参
+     * @return Object
+     */
+    Object chainCheck(SendMessageDTO sendMessageDTO);
 
     /**
      * 组装信息

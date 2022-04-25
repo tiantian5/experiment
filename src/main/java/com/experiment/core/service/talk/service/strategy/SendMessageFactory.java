@@ -1,4 +1,4 @@
-package com.experiment.core.service.talk.service.factory;
+package com.experiment.core.service.talk.service.strategy;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
