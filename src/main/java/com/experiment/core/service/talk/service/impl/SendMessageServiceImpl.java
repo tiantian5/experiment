@@ -28,7 +28,7 @@ public class SendMessageServiceImpl implements SendMessageService {
     private SendMessageFactory sendMessageFactory;
 
     @Override
-    public void sendMessage(SendMessageDTO sendMessageDTO) {
+    public String sendMessage(SendMessageDTO sendMessageDTO) {
 
         // 1、根据平台分流处理
         SendMessageStrategy dealFactoryTwoStrategy = sendMessageFactory.getDealFactoryTwoStrategy(sendMessageDTO.getPlatFormCode());
@@ -40,8 +40,10 @@ public class SendMessageServiceImpl implements SendMessageService {
         String result = dealFactoryTwoStrategy.sendMessageForPlatForm(sendMessageContext, sendMessageDTO);
         if (StringUtils.isBlank(result) || JSONObject.parseObject(result, SendMessageResultDTO.class) == null
                 || JSONObject.parseObject(result, SendMessageResultDTO.class).getErrcode() != 0) {
-            throw new RuntimeException("推送消息异常，errorMsg:" + result);
+            log.error("推送消息异常，errorMsg:" + result);
         }
+
+        return result;
 
     }
 

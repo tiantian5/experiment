@@ -27,7 +27,8 @@ public interface SendMessageService {
      * </p>
      *
      * @param sendMessageDTO 外部传入内容
+     * @return 推送结果
      */
-    void sendMessage(SendMessageDTO sendMessageDTO);
+    String sendMessage(SendMessageDTO sendMessageDTO);
 
 }

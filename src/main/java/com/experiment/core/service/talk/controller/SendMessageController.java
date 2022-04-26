@@ -28,7 +28,8 @@ public class SendMessageController {
     @ResponseBody
     public void testDingDing(@RequestBody SendMessageDTO sendMessageDTO){
 
-        sendMessageService.sendMessage(sendMessageDTO);
+        String s = sendMessageService.sendMessage(sendMessageDTO);
+        System.out.println(s);
 
     }
 
