@@ -28,22 +28,30 @@ public class SendMessageServiceImpl implements SendMessageService {
     private SendMessageFactory sendMessageFactory;
 
     @Override
-    public String sendMessage(SendMessageDTO sendMessageDTO) {
+    public SendMessageResultDTO sendMessage(SendMessageDTO sendMessageDTO) {
 
-        // 1、根据平台分流处理
-        SendMessageStrategy dealFactoryTwoStrategy = sendMessageFactory.getDealFactoryTwoStrategy(sendMessageDTO.getPlatFormCode());
-        // 2、校验+风控校验
-        dealFactoryTwoStrategy.chainCheck(sendMessageDTO);
-        // 3、将外部信息转换为可发送的实体
-        SendMessageContext sendMessageContext = dealFactoryTwoStrategy.assembleSendMsg(sendMessageDTO);
-        // 4、发送消息
-        String result = dealFactoryTwoStrategy.sendMessageForPlatForm(sendMessageContext, sendMessageDTO);
-        if (StringUtils.isBlank(result) || JSONObject.parseObject(result, SendMessageResultDTO.class) == null
-                || JSONObject.parseObject(result, SendMessageResultDTO.class).getErrcode() != 0) {
-            log.error("推送消息异常，errorMsg:" + result);
+        try {
+            // 1、根据平台分流处理
+            SendMessageStrategy dealFactoryTwoStrategy = sendMessageFactory.getDealFactoryTwoStrategy(sendMessageDTO.getPlatFormCode());
+            // 2、校验+风控校验
+            dealFactoryTwoStrategy.chainCheck(sendMessageDTO);
+            // 3、将外部信息转换为可发送的实体
+            SendMessageContext sendMessageContext = dealFactoryTwoStrategy.assembleSendMsg(sendMessageDTO);
+            // 4、发送消息
+            String result = dealFactoryTwoStrategy.sendMessageForPlatForm(sendMessageContext, sendMessageDTO);
+            SendMessageResultDTO sendMessageResultDTO = JSONObject.parseObject(result, SendMessageResultDTO.class);
+            if (StringUtils.isBlank(result) || JSONObject.parseObject(result, SendMessageResultDTO.class) == null
+                    || JSONObject.parseObject(result, SendMessageResultDTO.class).getErrcode() != 0) {
+                log.error("推送消息异常，errorMsg:" + result);
+            }
+
+            return sendMessageResultDTO;
+        } catch (Exception e) {
+            SendMessageResultDTO sendMessageResultDTO = new SendMessageResultDTO();
+            sendMessageResultDTO.setErrcode(111);
+            sendMessageResultDTO.setErrmsg("推送失败......");
+            return sendMessageResultDTO;
         }
-
-        return result;
 
     }
 

@@ -9,8 +9,12 @@ import com.experiment.core.service.talk.params.WeChatTextDTO;
 import com.experiment.core.service.talk.service.chain.model.AbstractChainStrategy;
 import com.experiment.core.service.talk.service.context.SendMessageContext;
 import com.experiment.core.service.talk.service.strategy.SendMessageStrategy;
+import com.experiment.core.service.talk.util.SendMessageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -141,7 +145,32 @@ public class WeChatSendMessageModel extends AbstractChainStrategy implements Sen
     @Override
     public String sendMessageForPlatForm(SendMessageContext sendMessageContext, SendMessageDTO sendMessageDTO) {
 
-        return null;
+        EnumSendType enumSendTypeByType = EnumSendType.getEnumSendTypeByType(sendMessageDTO.getMsgType());
+        Map<String, String> headParam = new HashMap<>(8);
+        headParam.put("Content-type", "application/json;charset=UTF-8");
+        String result = StringUtils.EMPTY;
+        switch (enumSendTypeByType) {
+            case TEXT:
+                result = SendMessageUtil.httpPostMethod(sendMessageDTO.getRobotUrl(), headParam, JSONObject.toJSONString(sendMessageContext.getWeChatTextDTO()));
+                break;
+
+            case LINK:
+//                result = SendMessageUtil.httpPostMethod(sendMessageDTO.getRobotUrl() + "&timestamp=" + time + "&sign=" + SendMessageUtil.sign(time, sendMessageDTO.getSign())
+//                        , headParam, JSONObject.toJSONString(sendMessageContext.getDingDingLinkDTO()));
+                break;
+
+            case IMAGE:
+//                result = SendMessageUtil.httpPostMethod(sendMessageDTO.getRobotUrl() + "&timestamp=" + time + "&sign=" + SendMessageUtil.sign(time, sendMessageDTO.getSign())
+//                        , headParam, JSONObject.toJSONString(sendMessageContext.getDingDingImageDTO()));
+                break;
+
+            default:
+                break;
+
+        }
+
+        return result;
+
     }
 
     @Override

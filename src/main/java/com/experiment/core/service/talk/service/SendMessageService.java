@@ -1,6 +1,7 @@
 package com.experiment.core.service.talk.service;
 
 import com.experiment.core.service.talk.dto.SendMessageDTO;
+import com.experiment.core.service.talk.dto.SendMessageResultDTO;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,6 +30,6 @@ public interface SendMessageService {
      * @param sendMessageDTO 外部传入内容
      * @return 推送结果
      */
-    String sendMessage(SendMessageDTO sendMessageDTO);
+    SendMessageResultDTO sendMessage(SendMessageDTO sendMessageDTO);
 
 }

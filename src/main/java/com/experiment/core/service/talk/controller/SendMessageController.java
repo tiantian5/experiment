@@ -1,6 +1,7 @@
 package com.experiment.core.service.talk.controller;
 
 import com.experiment.core.service.talk.dto.SendMessageDTO;
+import com.experiment.core.service.talk.dto.SendMessageResultDTO;
 import com.experiment.core.service.talk.service.SendMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -28,7 +29,7 @@ public class SendMessageController {
     @ResponseBody
     public void testDingDing(@RequestBody SendMessageDTO sendMessageDTO){
 
-        String s = sendMessageService.sendMessage(sendMessageDTO);
+        SendMessageResultDTO s = sendMessageService.sendMessage(sendMessageDTO);
         System.out.println(s);
 
     }
