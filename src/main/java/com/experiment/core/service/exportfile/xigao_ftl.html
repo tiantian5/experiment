@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="author" content="Microsoft Office User" />
+    <style type="text/css">
+        html { font-family:Calibri, Arial, Helvetica, sans-serif; font-size:12pt; }
+        .sheet0 {
+            border-top: 1px solid;
+            border-bottom: 1px solid;
+            border-left: 1px solid;
+            border-right: 1px solid;
+            border-collapse: collapse;
+        }
+        .sheet0 th, .sheet0 td {
+            border-top: 1px solid;
+            border-bottom: 1px solid;
+            border-left: 1px solid;
+            border-right: 1px solid;
+        }
+        .col0 {
+            width: 120px;
+        }
+        .col1 {
+            width: 180px;
+        }
+        .col2 {
+            width: 180px;
+        }
+        .col3 {
+            width: 120px;
+        }
+        .col4 {
+            width: 120px;
+        }
+        .row0 {
+            vertical-align:middle;
+            text-align:center;
+        }
+        .img0 {
+            position: absolute;
+            z-index: 1;
+            left: 10px;
+            width: 132px;
+            height: 72px;
+        }
+        .td0 {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        .td_title {
+            vertical-align:middle;
+            text-align:center;
+            font-size: 14px;
+            font-weight: bold;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .td_content {
+            vertical-align:middle;
+            font-size: 12px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .td_detail {
+            vertical-align:middle;
+            text-align:center;
+            font-size: 12px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        body { margin-left: 20px; margin-right: 20px; margin-top: 20px; margin-bottom: 20px; }
+    </style>
+</head>
+
+<body>
+<table class="sheet0" border="1">
+    <colgroup>
+        <col class="col0">
+        <col class="col1">
+        <col class="col2">
+        <col class="col3">
+        <col class="col4">
+    </colgroup>
+    <tbody>
+    <tr class="row0">
+        <td class="td0" colspan="5">
+            <div style="position: relative;"><img class="img0" src="${factoryLogo!''}" border="0" /></div>
+            <span style="font-weight:bold; color:#000000; font-family:'等线'; font-size:20pt">${factoryName!''}</span>
+            <span style="font-weight:bold; color:#000000; font-family:'等线'; font-size:18pt"><br/></span>
+            <span style="font-weight:bold; color:#000000; font-family:'等线'; font-size:16pt">${reportName!''}</span>
+        </td>
+    </tr>
+    <tr class="row1">
+        <td class="td_title">${solderTypeName!''}</td>
+        <td class="td_content" colspan="2">${solderPasteCode!''}</td>
+        <td class="td_title">型号</td>
+        <td class="td_content">${model!''}</td>
+    </tr>
+    <tr class="row1">
+        <td class="td_title">规格</td>
+        <td class="td_content" colspan="2">${specification!''}</td>
+        <td class="td_title">批次号</td>
+        <td class="td_content">${batchNo!''}</td>
+    </tr>
+    <tr class="row2">
+        <td class="td_title">供应商名称</td>
+        <td class="td_content" colspan="2">${supplierName!''}</td>
+        <td class="td_title">生产日期</td>
+        <td class="td_content">${productionDate!''}</td>
+    </tr>
+    <tr class="row3">
+        <td class="td_title">保质期(天)</td>
+        <td class="td_content" colspan="2">${shelfLife!''}</td>
+        <td class="td_title">入库时间</td>
+        <td class="td_content">${storageTime!''}</td>
+    </tr>
+    <tr class="row4">
+        <td class="td_title">序号</td>
+        <td class="td_title">使用流程</td>
+        <td class="td_title">扫码时间</td>
+        <td class="td_title">扫码人</td>
+        <td class="td_title">持续时间</td>
+    </tr>
+    <#list recordInfoDTO as item>
+        <tr class="row6">
+            <td class="td_detail">${item.step!''}</td>
+            <td class="td_detail">${item.useDesc!''}</td>
+            <td class="td_detail">${item.useTimeDesc!''}</td>
+            <td class="td_detail">${item.person!''}</td>
+            <td class="td_detail">${item.timeDesc!''}</td>
+        </tr>
+    </#list>
+    <tr class="row7">
+        <td class="td_title">导出时间</td>
+        <td class="td_detail">${exportTime!''}</td>
+        <td class="td_detail"></td>
+        <td class="td_title">导出人</td>
+        <td class="td_detail">${exporter!''}</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

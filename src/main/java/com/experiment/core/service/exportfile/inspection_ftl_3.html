@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="author" content="Microsoft Office User" />
+    <style type="text/css">
+        html { font-family:Calibri, Arial, Helvetica, sans-serif; font-size:12pt; }
+        .sheet0 {
+            border-top: 1px solid;
+            border-bottom: 1px solid;
+            border-left: 1px solid;
+            border-right: 1px solid;
+            border-collapse: collapse;
+        }
+        .sheet0 th, .sheet0 td {
+            border-top: 1px solid;
+            border-bottom: 1px solid;
+            border-left: 1px solid;
+            border-right: 1px solid;
+        }
+        .col0 {
+            width: 120px;
+        }
+        .col1 {
+            width: 120px;
+        }
+        .col2 {
+            width: 120px;
+        }
+        .col3 {
+            width: 120px;
+        }
+        .col4 {
+            width: 120px;
+        }
+        .col5 {
+            width: 120px;
+        }
+        .col6 {
+            width: 120px;
+        }
+        .row0 {
+            vertical-align:middle;
+            text-align:center;
+        }
+        .img0 {
+            position: absolute;
+            z-index: 1;
+            left: 10px;
+            width: 132px;
+            height: 72px;
+        }
+        .td0 {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        .td_title {
+            vertical-align:middle;
+            text-align:center;
+            font-size: 14px;
+            font-weight: bold;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .td_content {
+            vertical-align:middle;
+            font-size: 12px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .td_detail {
+            vertical-align:middle;
+            text-align:center;
+            font-size: 12px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .res_pass {
+            vertical-align:middle;
+            text-align:center;
+            font-size: 14px;
+            font-weight: bold;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            color: #1de109;
+        }
+        .res_fail {
+            vertical-align:middle;
+            text-align:center;
+            font-size: 14px;
+            font-weight: bold;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            color: #e10928;
+        }
+        body { margin-left: 20px; margin-right: 20px; margin-top: 20px; margin-bottom: 20px; }
+    </style>
+</head>
+
+<body>
+<table class="sheet0" border="1">
+    <colgroup>
+        <col class="col0">
+        <col class="col1">
+        <col class="col2">
+        <col class="col3">
+        <col class="col4">
+        <col class="col5">
+        <col class="col6">
+    </colgroup>
+    <tbody>
+    <tr class="row0">
+        <td class="td0" colspan="7">
+            <div style="position: relative;"><img class="img0" src="${factoryLogo!''}" border="0" /></div>
+            <span style="font-weight:bold; color:#000000; font-family:'等线'; font-size:20pt">${factoryName!''}</span>
+            <span style="font-weight:bold; color:#000000; font-family:'等线'; font-size:18pt"><br/></span>
+            <span style="font-weight:bold; color:#000000; font-family:'等线'; font-size:16pt">${reportName!''}</span>
+        </td>
+    </tr>
+    <tr class="row1">
+        <td class="td_title">物料编号</td>
+        <td class="td_content">${materialCode!''}</td>
+        <td class="td_title">物料名称</td>
+        <td class="td_content">${materialName!''}</td>
+        <td class="td_title">物料型号</td>
+        <td class="td_content" colspan="2">${materialModel!''}</td>
+    </tr>
+    <tr class="row1">
+        <td class="td_title">物料描述</td>
+        <td class="td_content">${materialDesc!''}</td>
+        <td class="td_title">供应商编号</td>
+        <td class="td_content">${supplierCode!''}</td>
+        <td class="td_title">供应商名称</td>
+        <td class="td_content" colspan="2">${supplierName!''}</td>
+    </tr>
+    <tr class="row2">
+        <td class="td_title">送货单号</td>
+        <td class="td_content">${orderNo!''}</td>
+        <td class="td_title">数量</td>
+        <td class="td_content">${inspectionTaskNumber!''}</td>
+        <td class="td_content" colspan="3"></td>
+    </tr>
+    <tr class="row3">
+        <td class="td_title">送检日期</td>
+        <td class="td_content">${createDate!''}</td>
+        <td class="td_title">检验日期</td>
+        <td class="td_content">${executeDate!''}</td>
+        <td class="td_title">抽样方案</td>
+        <td class="td_content" colspan="2">${planName!''}</td>
+    </tr>
+    <tr class="row4">
+        <td class="td_title">检验结果</td>
+        <#if inspectionResult?? && inspectionResult == "通过">
+            <td class="td_title"><span class="res_pass">${inspectionResult!''}</span></td>
+        <#else>
+            <td class="td_title"><span class="res_fail">${inspectionResult!''}</span></td>
+        </#if>
+        <td class="td_title">检验执行</td>
+        <#if inspectionExecute?? && inspectionExecute == "允收">
+            <td class="td_title"><span class="res_pass">${inspectionExecute!''}</span></td>
+        <#else>
+            <td class="td_title"><span class="res_fail">${inspectionExecute!''}</span></td>
+        </#if>
+
+        <td class="td_title">检验人员</td>
+        <td class="td_content" colspan="2">${executor!''}</td>
+    </tr>
+    <tr class="row5">
+        <td class="td_title">序号</td>
+        <td class="td_title">检验项目</td>
+        <td class="td_title">检验项目描述</td>
+        <td class="td_title">检验工具</td>
+        <td class="td_title">检验参数</td>
+        <td class="td_title">检验结果</td>
+        <td class="td_title">检验记录</td>
+    </tr>
+    <#list itemList as item>
+        <tr class="row6">
+            <td class="td_detail" rowspan="${item.guidelineList?size + 5}">${item.seq!''}</td>
+            <td class="td_detail" rowspan="${item.guidelineList?size + 5}">${item.inspectionItemName!''}</td>
+            <td class="td_content" rowspan="${item.guidelineList?size + 5}">${item.inspectionItemDescribe!''}</td>
+            <td class="td_detail" rowspan="${item.guidelineList?size + 5}">${item.toolName!''}</td>
+            <td class="td_detail">AQL:${item.aql!''}</td>
+            <#if item.itemResult?? && item.itemResult == "通过">
+                <td class="td_detail" rowspan="${item.guidelineList?size + 5}"><span class="res_pass">${item.itemResult!''}</span></td>
+            <#else>
+                <td class="td_detail" rowspan="${item.guidelineList?size + 5}"><span class="res_fail">${item.itemResult!''}</span></td>
+            </#if>
+            <td class="td_detail" >不合格数：${item.failedNum!''}</td>
+        </tr>
+        <tr class="row7">
+            <td class="td_detail">AC:${item.ac!''}</td>
+            <td class="td_detail">合格数:${item.successNum!''}</td>
+        </tr>
+        <tr class="row7">
+            <td class="td_detail">RE:${item.re!''}</td>
+            <td class="td_detail"></td>
+        </tr>
+        <tr class="row7">
+            <td class="td_detail">抽样水平:${item.sampleLevel!''}</td>
+            <td class="td_detail"></td>
+        </tr>
+        <tr class="row7">
+            <td class="td_detail">抽样数量:${item.sampleNumber!''}</td>
+            <td class="td_detail">失败原因:${item.failReason!''}</td>
+        </tr>
+        <#list item.guidelineList as guide>
+            <tr class="row7">
+                <td class="td_detail">${guide.guideReference!''}</td>
+                <td class="td_detail">${guide.guideRes!''}</td>
+            </tr>
+        </#list>
+    </#list>
+    <tr class="row12">
+        <td class="td_title">导出时间</td>
+        <td class="td_detail">${exportTime!''}</td>
+        <td class="td_detail"></td>
+        <td class="td_detail"></td>
+        <td class="td_detail"></td>
+        <td class="td_title">导出人</td>
+        <td class="td_detail">${exporter!''}</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
