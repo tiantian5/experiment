@@ -3,9 +3,8 @@ package com.experiment.core.service.exportfile;
 import com.google.common.collect.Maps;
 import com.steadystate.css.parser.CSSOMParser;
 import com.steadystate.css.parser.SACParserCSS3;
-import com.tuya.csm.order.client.model.solder.SolderExportDTO;
+import com.tuya.csm.order.common.util.BeanCopyUtil;
 import com.tuya.csm.order.service.vo.inspectiontask.InspectionItemExportDTO;
-import com.tuya.csm.order.service.vo.inspectiontask.InspectionTaskExportDTO;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -55,10 +54,11 @@ public class ExportExcelServiceDemo {
     private static final String BASE_PATH = "/Users/song/Desktop/tmp_pdf/";
     
     public static void main(String[] args) throws Exception{
-        SolderExportDTO exportDTO = getXigaoExportDTO();
+//        SolderExportDTO exportDTO = getXigaoExportDTO();
+        InspectionTaskExportDTO exportDTO = getExportDTO();
 
-//        String htmlContent = getTemplate("/Users/song/Desktop/company_code/csm-order/csm-order-service/src/main/resources/inspection_ftl.html", exportDTO);
-        String htmlContent = getTemplate("/Users/song/Desktop/company_code/csm-order/csm-order-service/src/main/resources/xigao_ftl.html", exportDTO);
+        String htmlContent = getTemplate("/Users/song/Desktop/company_code/csm-order/csm-order-service/src/main/resources/inspection_ftl.html", exportDTO);
+//        String htmlContent = getTemplate("/Users/song/Desktop/company_code/csm-order/csm-order-service/src/main/resources/xigao_ftl.html", exportDTO);
         System.out.println(htmlContent);
         Document document = Jsoup.parse(htmlContent);
         Element style = document.head().select("style").first();
@@ -181,7 +181,7 @@ public class ExportExcelServiceDemo {
         item2.setSampleNumber("120");
         item2.setSuccessNum("21");
         item2.setFailedNum("22");
-        item2.setFailReason("1.这个不好；\r\n,2.那个不好");
+        item2.setFailReason("1.这个不好;|2.那个不好");
 
 
         List<InspectionItemExportDTO.InspectionGuideline> guidelineList = Lists.newArrayList();
@@ -208,20 +208,26 @@ public class ExportExcelServiceDemo {
         int size = cols.size();
         float[] widthArray = new float[size];
         int i = 0;
+        float total = 0;
         for (Element col : cols) {
             String className = col.attr("class");
             Map<String, String> attrMap = cssMap.get("." + className);
             String width = attrMap.get("width");
             float px = Float.parseFloat(width.replaceAll("px", ""));
             widthArray[i++] = px;
+            total += px;
         }
+
         Map<String, String> body = cssMap.get("body");
         HSSFWorkbook wb = new HSSFWorkbook(); //or new HSSFWorkbook();
         //create sheet
         Sheet sheet = wb.createSheet();
+        int totalWidth = 30000;
         for (int j = 0; j < widthArray.length; j++) {
-            int w = (int)widthArray[j];
-            sheet.setColumnWidth(j, w / 5 * 256);
+//            int w = (int)widthArray[j];
+//            sheet.setColumnWidth(j, w / 5 * 256);
+            float ratio = widthArray[j] / total;
+            sheet.setColumnWidth(j, (int)(totalWidth * ratio));
         }
 //        sheet.setColumnWidth(0, 13 * 256);
 //        sheet.setColumnWidth(1, 18 * 256);
@@ -300,78 +306,54 @@ public class ExportExcelServiceDemo {
         }
         Cell cell = row.createCell(colStart);
         String styleKey = td.attr("class");
-        System.out.println(styleKey);
-        System.out.println(td.html());
-        Map<String, String> styleMap = cssMap.get("." + styleKey);
-        String vertical = styleMap.get("vertical-align");
-        String textAlign = styleMap.get("text-align");
-        String fontSize = styleMap.get("font-size").replaceAll("px", "");
-        String bold = styleMap.get("font-weight");
-        String paddingTop = styleMap.get("padding-top").replaceAll("px", "");
-        String paddingBottom = styleMap.get("padding-bottom").replaceAll("px", "");
+        CssStyleModel baseStyleModel = generateCssModel(cssMap, "." + styleKey);
 
-        String color = null;
         Elements spans = td.getElementsByTag("span");
+        CellStyle cellStyle = wb.createCellStyle();
         if (CollectionUtils.isNotEmpty(spans)) {
-            Element span = spans.get(0);
-            String spanClass = span.attr("class");
-            if (org.apache.commons.lang3.StringUtils.isNotBlank(spanClass) && cssMap.containsKey("." + spanClass)) {
-                Map<String, String> spanStyleMap = cssMap.get("." + spanClass);
-                if (spanStyleMap.containsKey("font-size")) {
-                    fontSize = spanStyleMap.get("font-size").replaceAll("px", "");
+            int[][] indexArr = new int[spans.size()][];
+            HSSFFont[] fontArray = new HSSFFont[spans.size()];
+
+            StringBuilder builder = new StringBuilder();
+            int index = 0;
+            for (Element span : spans) {
+                CssStyleModel itemStyle = BeanCopyUtil.copyWithId(baseStyleModel, CssStyleModel.class);
+                String spanClass = span.attr("class");
+                updateCssModel(itemStyle, cssMap, "." + spanClass);
+                HSSFFont itemFont = createFontByCss(wb, colorMap, colorIndex, itemStyle);
+                fontArray[index] = itemFont;
+                int start = builder.length();
+                Elements brs = span.getElementsByTag("br");
+                if (CollectionUtils.isNotEmpty(brs)) {
+                    builder.append("\r\n");
+                } else {
+                    builder.append(span.text().replaceAll("\\|", "\r\n"));
                 }
-                if (spanStyleMap.containsKey("font-weight")) {
-                    bold = spanStyleMap.get("font-weight");
-                }
-                if (spanStyleMap.containsKey("color")) {
-                    color = spanStyleMap.get("color").replaceAll("#", "");
-                }
+                int end = builder.length();
+                indexArr[index] = new int[]{start, end};
+                index++;
             }
+            HSSFRichTextString richStr = new HSSFRichTextString(builder.toString());
+            for (int i = 0; i < spans.size(); i++) {
+                HSSFFont hssfFont = fontArray[i];
+                int[] indexPair = indexArr[i];
+                richStr.applyFont(indexPair[0], indexPair[1], hssfFont);
+            }
+            cell.setCellValue(richStr);
+        } else {
+            cellStyle.setFont(createFontByCss(wb, colorMap, colorIndex, baseStyleModel));
+            cell.setCellValue(td.text());
         }
 
-        HSSFFont font = wb.createFont();
-        font.setFontName("等线");
-        font.setFontHeightInPoints(Short.parseShort(fontSize));
-        if (StringUtils.isNotBlank(color)) {
-            String rgb = color.replaceAll("rgb", "").replaceAll("\\(", "").replaceAll("\\)", "").replaceAll(" ", "");
-            String[] split = rgb.split(",");
-            int red = Integer.parseInt(split[0]);
-            int green = Integer.parseInt(split[1]);
-            int blue = Integer.parseInt(split[2]);
-            byte[] rgbArray = new byte[]{(byte)red, (byte)green, (byte)blue};
-//            if (font instanceof XSSFFont) {
-//                XSSFFont xssfFont = (XSSFFont)font;
-//                xssfFont.setColor(new XSSFColor(rgb, null));
-//            } else if (font instanceof HSSFFont) {
-//                font.setColor(HSSFColor.HSSFColorPredefined.LIME.getIndex());
-//                HSSFWorkbook hssfworkbook = (HSSFWorkbook)workbook;
-//                HSSFPalette palette = hssfworkbook.getCustomPalette();
-//                palette.setColorAtIndex(HSSFColor.HSSFColorPredefined.LIME.getIndex(), rgb[0], rgb[1], rgb[2]);
-//            }
-            String colorKey = red + "_" + green + "_" + blue;
-            Integer existColorIndex = colorMap.get(colorKey);
-            if (existColorIndex == null) {
-                colorIndex.addAndGet(1);
-                font.setColor((short) colorIndex.get());
-                HSSFPalette palette = wb.getCustomPalette();
-                palette.setColorAtIndex((short)colorIndex.get(), rgbArray[0], rgbArray[1], rgbArray[2]);
-//                colorMap.put(colorKey, colorIndex.get());
-            } else {
-                font.setColor(existColorIndex.shortValue());
-            }
-        }
-        CellStyle cellStyle = wb.createCellStyle();
+
         cellStyle.setWrapText(true);
-        if (StringUtils.equals(vertical, "middle")) {
+        if (StringUtils.equals(baseStyleModel.getVerticalAlign(), "middle")) {
             cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         }
-        if (StringUtils.equals(textAlign, "center")) {
+        if (StringUtils.equals(baseStyleModel.getHorizontalAlign(), "center")) {
             cellStyle.setAlignment(HorizontalAlignment.CENTER);
         } else {
             cellStyle.setAlignment(HorizontalAlignment.LEFT);
-        }
-        if (StringUtils.equals(bold, "bold")) {
-            font.setBold(true);
         }
 
         cellStyle.setBorderTop(BorderStyle.THIN);
@@ -385,9 +367,78 @@ public class ExportExcelServiceDemo {
             RegionUtil.setBorderLeft(BorderStyle.THIN, region, sheet);
             RegionUtil.setBorderRight(BorderStyle.THIN, region, sheet);
         }
-        cellStyle.setFont(font);
         cell.setCellStyle(cellStyle);
-        cell.setCellValue(td.text());
+    }
+
+    private static HSSFFont createFontByCss(HSSFWorkbook wb, Map<String, Integer> colorMap, AtomicInteger colorIndex, CssStyleModel style) {
+        HSSFFont font = wb.createFont();
+        font.setFontName("等线");
+        font.setFontHeightInPoints(style.getFontSize().shortValue());
+        int[] rgb = style.getFontColorRgb();
+        if (rgb != null && rgb.length == 3) {
+            byte[] rgbArray = new byte[] {(byte) rgb[0], (byte) rgb[1], (byte) rgb[2]};
+//            if (font instanceof XSSFFont) {
+//                XSSFFont xssfFont = (XSSFFont)font;
+//                xssfFont.setColor(new XSSFColor(rgb, null));
+//            } else if (font instanceof HSSFFont) {
+//                font.setColor(HSSFColor.HSSFColorPredefined.LIME.getIndex());
+//                HSSFWorkbook hssfworkbook = (HSSFWorkbook)workbook;
+//                HSSFPalette palette = hssfworkbook.getCustomPalette();
+//                palette.setColorAtIndex(HSSFColor.HSSFColorPredefined.LIME.getIndex(), rgb[0], rgb[1], rgb[2]);
+//            }
+            String colorKey = rgb[0] + "_" + rgb[1] + "_" + rgb[2];
+            Integer existColorIndex = colorMap.get(colorKey);
+            if (existColorIndex == null) {
+                colorIndex.addAndGet(1);
+                font.setColor((short) colorIndex.get());
+                HSSFPalette palette = wb.getCustomPalette();
+                palette.setColorAtIndex((short) colorIndex.get(), rgbArray[0], rgbArray[1], rgbArray[2]);
+                colorMap.put(colorKey, colorIndex.get());
+            } else {
+                font.setColor(existColorIndex.shortValue());
+            }
+        }
+        font.setBold(style.getBold());
+        return font;
+    }
+
+    private static void updateCssModel(CssStyleModel res, Map<String, Map<String, String>> cssMap, String key) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(key) || !cssMap.containsKey(key)) {
+            return;
+        }
+        Map<String, String> styleMap = cssMap.get(key);
+        res.setVerticalAlign(styleMap.get("vertical-align"));
+        res.setHorizontalAlign(styleMap.get("text-align"));
+        String fontSize = styleMap.getOrDefault("font-size", "").replaceAll("px", "");
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(fontSize)) {
+            res.setFontSize(Integer.parseInt(fontSize));
+        }
+        String bold = styleMap.getOrDefault("font-weight", "");
+        res.setBold(org.apache.commons.lang3.StringUtils.equals(bold, "bold"));
+        String paddingTop = styleMap.getOrDefault("padding-top", "").replaceAll("px", "");
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(paddingTop)) {
+            res.setPaddingTop(Integer.parseInt(paddingTop));
+        }
+        String paddingBottom = styleMap.getOrDefault("padding-bottom", "").replaceAll("px", "");
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(paddingBottom)) {
+            res.setPaddingBottom(Integer.parseInt(paddingBottom));
+        }
+        String rgb = styleMap.getOrDefault("color", "").replaceAll("#", "");
+        rgb = rgb.replaceAll("rgb", "").replaceAll("\\(", "").replaceAll("\\)", "").replaceAll(" ", "");
+
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(rgb)) {
+            String[] split = rgb.split(",");
+            int red = Integer.parseInt(split[0]);
+            int green = Integer.parseInt(split[1]);
+            int blue = Integer.parseInt(split[2]);
+            res.setFontColorRgb(new int[]{red, green, blue});
+        }
+    }
+
+    private static CssStyleModel generateCssModel(Map<String, Map<String, String>> cssMap, String key) {
+        CssStyleModel res = new CssStyleModel();
+        updateCssModel(res, cssMap, key);
+        return res;
     }
 
     private static void createHeadCell(HSSFWorkbook wb, Sheet sheet, Element td,int rowStart, int colStart, int rowspan, int colspan) throws Exception{
@@ -413,6 +464,7 @@ public class ExportExcelServiceDemo {
         HSSFRichTextString ts = new HSSFRichTextString(span1.text() + "\r\n" + span3.text());
         ts.applyFont(0, span1.text().length(), font1);
         ts.applyFont(span1.text().length()+1, ts.length(), font2);
+
 
         CellStyle cellStyle = wb.createCellStyle();
         cellStyle.setAlignment(HorizontalAlignment.CENTER);

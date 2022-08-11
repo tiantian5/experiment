@@ -5,6 +5,7 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.steadystate.css.parser.CSSOMParser;
 import com.steadystate.css.parser.SACParserCSS3;
+import com.tuya.csm.order.common.util.BeanCopyUtil;
 import com.tuya.csm.order.ingetration.file.CetusStorageService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -12,6 +13,7 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
@@ -171,41 +173,37 @@ public class ExportPdfService {
     private static void generateCell(PdfPCell[] pdfPCells, PdfPRow row, Element td, int rowIndex, int rowspan, int colIndex, int colspan, Map<String, Map<String, String>> cssMap) {
         String styleKey = td.attr("class");
 
-        Map<String, String> styleMap = cssMap.get("." + styleKey);
-        String vertical = styleMap.get("vertical-align");
-        String textAlign = styleMap.get("text-align");
-        String fontSize = styleMap.get("font-size").replaceAll("px", "");
-        String bold = styleMap.get("font-weight");
-        String paddingTop = styleMap.get("padding-top").replaceAll("px", "");
-        String paddingBottom = styleMap.get("padding-bottom").replaceAll("px", "");
-        String color = null;
+        CssStyleModel baseStyleModel = generateCssModel(cssMap, "." + styleKey);
         Elements spans = td.getElementsByTag("span");
+        List<com.itextpdf.text.Element> elementList = Lists.newArrayList();
         if (CollectionUtils.isNotEmpty(spans)) {
-            Element span = spans.get(0);
-            String spanClass = span.attr("class");
-            if (StringUtils.isNotBlank(spanClass) && cssMap.containsKey("." + spanClass)) {
-                Map<String, String> spanStyleMap = cssMap.get("." + spanClass);
-                if (spanStyleMap.containsKey("font-size")) {
-                    fontSize = spanStyleMap.get("font-size").replaceAll("px", "");
-                }
-                if (spanStyleMap.containsKey("font-weight")) {
-                    bold = spanStyleMap.get("font-weight");
-                }
-                if (spanStyleMap.containsKey("color")) {
-                    color = spanStyleMap.get("color").replaceAll("#", "");
+            for (Element span : spans) {
+                CssStyleModel itemStyle = BeanCopyUtil.copyWithId(baseStyleModel, CssStyleModel.class);
+                String spanClass = span.attr("class");
+                updateCssModel(itemStyle, cssMap, "." + spanClass);
+
+                Font itemFont = createFontByCss(itemStyle);
+
+                String[] split = span.text().split("\\|");
+                for (String line : split) {
+                    Paragraph paragraph = new Paragraph(line, itemFont);
+                    if (StringUtils.equals(itemStyle.getHorizontalAlign(), "center")) {
+                        paragraph.setAlignment(com.itextpdf.text.Element.ALIGN_CENTER);
+                    } else {
+                        paragraph.setAlignment(com.itextpdf.text.Element.ALIGN_LEFT);
+                    }
+                    elementList.add(paragraph);
                 }
             }
+        } else {
+            Font font = createFontByCss(baseStyleModel);
+            elementList.add(new Paragraph(td.text(), font));
         }
-        Font font = FontFactory.getFont("classpath:ttf/arialuni.ttf", "Identity-H", BaseFont.EMBEDDED, Integer.parseInt(fontSize), StringUtils.equals(bold, "bold") ? Font.BOLD : Font.NORMAL);
-        if (StringUtils.isNotBlank(color)) {
-            String rgb = color.replaceAll("rgb", "").replaceAll("\\(", "").replaceAll("\\)", "").replaceAll(" ", "");
-            String[] split = rgb.split(",");
-            int red = Integer.parseInt(split[0]);
-            int green = Integer.parseInt(split[1]);
-            int blue = Integer.parseInt(split[2]);
-            font.setColor(new BaseColor(red, green, blue));
+
+        PdfPCell cell = new PdfPCell();
+        for (com.itextpdf.text.Element element : elementList) {
+            cell.addElement(element);
         }
-        PdfPCell cell = new PdfPCell(new Paragraph(td.text(), font));
         if (colspan > 1) {
             cell.setColspan(colspan);
         }
@@ -213,22 +211,72 @@ public class ExportPdfService {
             cell.setRowspan(rowspan);
         }
 
-        if (StringUtils.equals(vertical, "middle")) {
+        if (StringUtils.equals(baseStyleModel.getVerticalAlign(), "middle")) {
             cell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
         }
-        if (StringUtils.equals(textAlign, "center")) {
+        if (StringUtils.equals(baseStyleModel.getHorizontalAlign(), "center")) {
             cell.setHorizontalAlignment(com.itextpdf.text.Element.ALIGN_CENTER);
         } else {
             cell.setHorizontalAlignment(com.itextpdf.text.Element.ALIGN_LEFT);
         }
-        if (StringUtils.isNotBlank(paddingTop)) {
-            cell.setPaddingTop(Integer.parseInt(paddingTop));
+        if (baseStyleModel.getPaddingTop() != null) {
+            cell.setPaddingTop(baseStyleModel.getPaddingTop());
         }
-        if (StringUtils.isNotBlank(paddingBottom)) {
-            cell.setPaddingBottom(Integer.parseInt(paddingBottom));
+        if (baseStyleModel.getPaddingBottom() != null) {
+            cell.setPaddingBottom(baseStyleModel.getPaddingBottom());
         }
 
         pdfPCells[colIndex] = cell;
+    }
+
+    private static Font createFontByCss(CssStyleModel style) {
+        Font font = FontFactory.getFont("classpath:ttf/arialuni.ttf",
+                "Identity-H", BaseFont.EMBEDDED,
+                style.getFontSize(), style.getBold() ? Font.BOLD : Font.NORMAL);
+        int[] rgb = style.getFontColorRgb();
+        if (rgb != null && rgb.length == 3) {
+            font.setColor(new BaseColor(rgb[0], rgb[1], rgb[2]));
+        }
+        return font;
+    }
+
+    private static void updateCssModel(CssStyleModel res, Map<String, Map<String, String>> cssMap, String key) {
+        if (StringUtils.isBlank(key) || !cssMap.containsKey(key)) {
+            return;
+        }
+        Map<String, String> styleMap = cssMap.get(key);
+        res.setVerticalAlign(styleMap.get("vertical-align"));
+        res.setHorizontalAlign(styleMap.get("text-align"));
+        String fontSize = styleMap.getOrDefault("font-size", "").replaceAll("px", "");
+        if (StringUtils.isNotBlank(fontSize)) {
+            res.setFontSize(Integer.parseInt(fontSize));
+        }
+        String bold = styleMap.getOrDefault("font-weight", "");
+        res.setBold(StringUtils.equals(bold, "bold"));
+        String paddingTop = styleMap.getOrDefault("padding-top", "").replaceAll("px", "");
+        if (StringUtils.isNotBlank(paddingTop)) {
+            res.setPaddingTop(Integer.parseInt(paddingTop));
+        }
+        String paddingBottom = styleMap.getOrDefault("padding-bottom", "").replaceAll("px", "");
+        if (StringUtils.isNotBlank(paddingBottom)) {
+            res.setPaddingBottom(Integer.parseInt(paddingBottom));
+        }
+        String rgb = styleMap.getOrDefault("color", "").replaceAll("#", "");
+        rgb = rgb.replaceAll("rgb", "").replaceAll("\\(", "").replaceAll("\\)", "").replaceAll(" ", "");
+
+        if (StringUtils.isNotBlank(rgb)) {
+            String[] split = rgb.split(",");
+            int red = Integer.parseInt(split[0]);
+            int green = Integer.parseInt(split[1]);
+            int blue = Integer.parseInt(split[2]);
+            res.setFontColorRgb(new int[]{red, green, blue});
+        }
+    }
+
+    private static CssStyleModel generateCssModel(Map<String, Map<String, String>> cssMap, String key) {
+        CssStyleModel res = new CssStyleModel();
+        updateCssModel(res, cssMap, key);
+        return res;
     }
 
     private void generateHeaderCell(PdfPCell[] pdfPCells, PdfPRow row, Element td, int rowIndex, int rowspan, int colIndex, int colspan) throws Exception{
